@@ -5,8 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.jgraph.graph.DefaultEdge;
+import org.jgraph.graph.Edge;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.ListenableDirectedGraph;
 import org.jgrapht.graph.ListenableUndirectedGraph;
@@ -14,22 +17,27 @@ import org.jgrapht.graph.ListenableUndirectedGraph;
 public class Verificateur {
 	private int k;
 	private File inputGraph;
-	private int[] c;
-	private ListenableGraph g;
+	private String[] c;
+	private ListenableGraph<Object, Edge> g;
 
 	public static void main(String[] args) throws IOException {
-		Verificateur v = new Verificateur(3, "inputGraph", new int[] { 1, 3, 5 });
+		Verificateur v = new Verificateur(3, "inputGraph", new String[] { "2", "3", "5" });
 
 	}
 
-	public Verificateur(int k, String fileName, int[] certificat)
+	public Verificateur(int k, String fileName, String[] certificat)
 			throws IOException {
 		this.k = k;
 		this.inputGraph = new File(fileName);
 		this.c = certificat;
-		this.g = new ListenableUndirectedGraph(DefaultEdge.class);
+		this.g = new ListenableUndirectedGraph<Object, Edge>(DefaultEdge.class);
 
 		this.creerGraphe(this.loadFile(this.inputGraph));
+		
+		if(this.verifierGraphe(this.c))
+		{
+			System.out.println("On a gagné!!");
+		}
 
 	}
 
@@ -84,5 +92,36 @@ public class Verificateur {
 			this.g.addEdge(arretesListe.get(i)[0], arretesListe.get(i)[1]);
 		}
 	}
+	
+	public boolean verifierGraphe(String[] c)
+	{
+		ArrayList<Edge> memory = new ArrayList<Edge>();
+		for(int i=0;i<c.length; i++)
+		{
+			Set<Edge> arretes = g.edgesOf(c[i]);
+			Iterator<Edge> j = arretes.iterator();
+			while(j.hasNext())
+			{
+				memory.add(j.next());
+				
+			}
+		}
+		for(int i=0; i<memory.size();i++)
+		{
+			g.removeEdge(memory.get(i));
+		}
+		Set<Edge> arretesRestantes = g.edgeSet();
+		if(arretesRestantes.isEmpty())
+		{
+			System.out.println("verifié");
+			return true;
+		}
+		else
+		{
+			System.out.println("^perdu");
+			return false;
+		}
+	}
+		
 
 }
