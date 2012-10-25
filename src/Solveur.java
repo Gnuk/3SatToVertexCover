@@ -1,7 +1,6 @@
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -11,36 +10,30 @@ import java.util.Set;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.Edge;
 import org.jgrapht.ListenableGraph;
-import org.jgrapht.graph.ListenableDirectedGraph;
 import org.jgrapht.graph.ListenableUndirectedGraph;
 
-public class Verificateur {
+
+public class Solveur {
 	private int k;
 	private File inputGraph;
-	private String[] c;
 	private ListenableGraph<Object, Edge> g;
-
-	public static void main(String[] args) throws IOException {
-		Verificateur v = new Verificateur(3, "inputGraph", new String[] { "1", "3", "5" });
-
+	
+	public static void main(String[] args) {
+		Solveur s = new Solveur("graphToSolve") ;
 	}
-
-	public Verificateur(int k, String fileName, String[] certificat)
-			throws IOException {
-		this.k = k;
+	
+	public Solveur(String fileName)
+	{
 		this.inputGraph = new File(fileName);
-		this.c = certificat;
+
 		this.g = new ListenableUndirectedGraph<Object, Edge>(DefaultEdge.class);
 
 		this.creerGraphe(this.loadFile(this.inputGraph));
 		
-		if(this.verifierGraphe(this.c))
-		{
-			System.out.println("On a gagné!!");
-		}
+		this.verifierGraphe();
 
 	}
-
+	
 	public String loadFile(File f) throws IOException {
 		BufferedInputStream in = new BufferedInputStream(new FileInputStream(f));
 		StringWriter out = new StringWriter();
@@ -93,7 +86,7 @@ public class Verificateur {
 		}
 	}
 	
-	public boolean verifierGraphe(String[] c)
+	public boolean verifierGraphe()
 	{
 		ArrayList<Edge> memory = new ArrayList<Edge>();
 		for(int i=0;i<c.length; i++)
@@ -122,6 +115,4 @@ public class Verificateur {
 			return false;
 		}
 	}
-		
-
 }
