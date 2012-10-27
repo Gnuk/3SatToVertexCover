@@ -6,6 +6,7 @@ public class Reducteur {
 	private File input3SAT;
 	private ThreeSAT threeSat;
 	private TraitementFichier fichier;
+	private ArrayList<Sommet> sommets;
 	
 	/**
 	 * Constructeur du réducteur
@@ -15,6 +16,17 @@ public class Reducteur {
 	public Reducteur(String filename) throws IOException{
 		this.input3SAT = new File(filename);
 		this.getThreeSat();
+		System.out.println(this.threeSat.getExpr().get(1)[2]);
+		int k=0;
+		for(int i=0;i<this.threeSat.getExpr().size();i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				sommets.add(new Sommet(this.threeSat.getExpr().get(j)[i], k));
+				System.out.println(sommets.get(k).getNom());
+				k++;
+			}
+		}
 	}
 
 	/**
@@ -46,8 +58,8 @@ public class Reducteur {
 		}
 		this.threeSat = new ThreeSAT(Integer.valueOf(number).intValue());
 		for (int i = 0; i < numbers.size(); i++) {
-			int[] temp = new int[this.threeSat.getN()];
-			for(int y = 0; y<this.threeSat.getN(); y++){
+			int[] temp = new int[3];
+			for(int y = 0; y<3; y++){
 				temp[y] = Integer.valueOf((numbers.get(i)[y]).trim()).intValue();
 				// Affichage
 				System.out.println("values.get(" + i + ")["+y+"] => "+ temp[y]);
@@ -63,5 +75,7 @@ public class Reducteur {
 	 */
 	public static void main(String[] args) throws IOException {
 		Reducteur reducteur = new Reducteur("input3SAT");
+		
+		
 	}
 }

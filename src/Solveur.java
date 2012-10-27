@@ -17,12 +17,13 @@ public class Solveur {
 	private int k;
 	private File inputGraph;
 	private ListenableGraph<Object, Edge> g;
+	private String[] sommets;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Solveur s = new Solveur("graphToSolve") ;
 	}
 	
-	public Solveur(String fileName)
+	public Solveur(String fileName) throws IOException
 	{
 		this.inputGraph = new File(fileName);
 
@@ -30,8 +31,16 @@ public class Solveur {
 
 		this.creerGraphe(this.loadFile(this.inputGraph));
 		
-		this.verifierGraphe();
-
+		
+		for(int k=0;k<this.sommets.length;k++)
+		{
+			String[] certificats = new String[k];
+			for(int i=0;i<k;i++)
+			{
+				certificats[i] = sommets[i];
+			}
+			this.verifierGraphe(certificats);
+		}
 	}
 	
 	public String loadFile(File f) throws IOException {
@@ -69,7 +78,7 @@ public class Solveur {
 			}
 		}
 		strSommets = strSommets.trim();
-		String sommets[] = strSommets.split(" ");
+		this.sommets = strSommets.split(" ");
 		// Affichage
 		for (int i = 0; i < sommets.length; i++) {
 			System.out.println("sommets[" + i + "] : " + sommets[i]);
@@ -86,33 +95,34 @@ public class Solveur {
 		}
 	}
 	
-	public boolean verifierGraphe()
+	public boolean verifierGraphe(String[] certificats)
 	{
 		ArrayList<Edge> memory = new ArrayList<Edge>();
-		for(int i=0;i<c.length; i++)
-		{
-			Set<Edge> arretes = g.edgesOf(c[i]);
-			Iterator<Edge> j = arretes.iterator();
-			while(j.hasNext())
+
+			for(int i=0;i<certificats.length; i++)
 			{
-				memory.add(j.next());
-				
+				Set<Edge> arretes = g.edgesOf(certificats[i]);
+				Iterator<Edge> j = arretes.iterator();
+				while(j.hasNext())
+				{
+					memory.add(j.next());
+					
+				}
 			}
-		}
-		for(int i=0; i<memory.size();i++)
-		{
-			g.removeEdge(memory.get(i));
-		}
-		Set<Edge> arretesRestantes = g.edgeSet();
-		if(arretesRestantes.isEmpty())
-		{
-			System.out.println("verifié");
-			return true;
-		}
-		else
-		{
-			System.out.println("^perdu");
-			return false;
-		}
+			for(int i=0; i<memory.size();i++)
+			{
+				g.removeEdge(memory.get(i));
+			}
+			Set<Edge> arretesRestantes = g.edgeSet();
+			if(arretesRestantes.isEmpty())
+			{
+				System.out.println("verifié");
+				return true;
+			}
+			else
+			{
+				System.out.println("^perdu");
+				return false;
+			}
 	}
 }
