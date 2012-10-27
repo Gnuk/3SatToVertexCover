@@ -1,12 +1,16 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Reducteur {
 	private File input3SAT;
 	private ThreeSAT threeSat;
 	private TraitementFichier fichier;
 	private ArrayList<Sommet> sommets;
+	private ArrayList<Arrete> arretes;
 	
 	/**
 	 * Constructeur du réducteur
@@ -16,17 +20,83 @@ public class Reducteur {
 	public Reducteur(String filename) throws IOException{
 		this.input3SAT = new File(filename);
 		this.getThreeSat();
-		System.out.println(this.threeSat.getExpr().get(1)[2]);
+		this.sommets = new ArrayList<Sommet>();
+		this.arretes = new ArrayList<Arrete>();
 		int k=0;
 		for(int i=0;i<this.threeSat.getExpr().size();i++)
 		{
 			for(int j=0;j<3;j++)
 			{
-				sommets.add(new Sommet(this.threeSat.getExpr().get(j)[i], k));
-				System.out.println(sommets.get(k).getNom());
+				Sommet s = new Sommet(this.threeSat.getExpr().get(i)[j], k);
+				sommets.add(s);
 				k++;
 			}
 		}
+		
+		for(int i=0;i<this.sommets.size();i=i+3)
+		{
+			arretes.add(new Arrete(sommets.get(i), sommets.get(i+1)));
+			arretes.add(new Arrete(sommets.get(i+1), sommets.get(i+2)));
+			arretes.add(new Arrete(sommets.get(i+2), sommets.get(i)));
+		}
+		
+		ArrayList<Integer> literaux = new ArrayList<Integer>();
+		for(int i=0;i<this.sommets.size();i++)
+		{
+			literaux.add(sommets.get(i).getNom());
+		}
+	    Set set = new HashSet() ;
+        set.addAll(literaux) ;
+        ArrayList<Integer> distinctLiteraux = new ArrayList<Integer>(set) ;
+
+        ArrayList<Sommet> literauxUniques = new ArrayList<Sommet>();
+		for(int i=0;i<distinctLiteraux.size();i++)
+		{
+			literauxUniques.add(new Sommet(distinctLiteraux.get(i), i+100));
+		}
+
+		for(int i=0;i<sommets.size();i++)
+		{
+			for(int j=0;j<literauxUniques.size();j++)
+			{
+				if(sommets.get(i).getNom()==literauxUniques.get(j).getNom())
+				{
+					arretes.add(new Arrete(sommets.get(i), literauxUniques.get(j)));
+				}
+			}
+		}
+
+		for(int j=0;j<literauxUniques.size();j++)
+		{
+			for(int i=0;i<literauxUniques.size();i++)
+			{
+				if(literauxUniques.get(j).getNom()==(-literauxUniques.get(i).getNom()))
+				{	
+					arretes.add(new Arrete(literauxUniques.get(i), literauxUniques.get(j)));
+				}
+			}
+		}
+		
+
+	    String resultat = "Graph{\n";
+		for(int i=0;i<sommets.size();i++)
+		{
+			resultat = resultat+sommets.get(i).getNoSommet()+" ";
+		}
+		for(int i=0;i<literauxUniques.size();i++)
+		{
+			resultat = resultat+literauxUniques.get(i).getNoSommet()+" ";
+		}
+		resultat = resultat+"\n";
+		for(int i=0;i<arretes.size();i++)
+		{
+			resultat = resultat+arretes.get(i).getS1().getNoSommet()+"--"+arretes.get(i).getS2().getNoSommet()+"\n";
+		}
+		resultat= resultat+"{";
+	    FileWriter sortie = new FileWriter("outputReducteur");
+	    sortie.write(resultat);
+	    sortie.flush();
+	    sortie.close ();
 	}
 
 	/**
